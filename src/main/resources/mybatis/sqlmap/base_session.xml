@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mhdss.dc.dao.BaseSessionDAO">
+
+  <sql id="insert_columns">
+    (base_user_id, ip, session_code, lase_active_time, status, c_time, m_time)
+  </sql>
+
+  <sql id="insert_values">
+    (#{baseUserId}, #{ip}, #{sessionCode}, #{laseActiveTime}, #{status}, #{cTime}, #{mTime})
+  </sql>
+
+  <sql id="query_columns">
+    id, base_user_id AS baseUserId, ip, session_code AS sessionCode, lase_active_time AS laseActiveTime, status, c_time AS cTime, m_time AS mTime
+  </sql>
+
+  <sql id="where">
+    <where>
+      
+    </where>
+  </sql>
+
+  <sql id="limit_where">
+    <include refid="where"/>
+    <if test="range != 0">
+      LIMIT ${start}, ${range}
+    </if>
+  </sql>
+
+  <insert id="insert" parameterType="com.mhdss.dc.dataobject.BaseSessionDO">
+    <selectKey keyProperty="id" resultType="long">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>
+    INSERT INTO base_session <include refid="insert_columns"/> VALUES <include refid="insert_values"/>
+  </insert>
+
+  <update id="insertUpdateOnDuplicate" parameterType="com.mhdss.dc.dataobject.BaseSessionDO">
+    <selectKey keyProperty="id" resultType="long">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>
+    INSERT INTO base_session <include refid="insert_columns"/> VALUES <include refid="insert_values"/> ON DUPLICATE KEY UPDATE m_time = #{mTime}, id = LAST_INSERT_ID(id)
+  </update>
+
+  <update id="updateById" parameterType="com.mhdss.dc.dataobject.BaseSessionDO">
+    UPDATE base_session
+    <set>
+      <if test="baseUserId != null">
+        base_user_id = #{baseUserId},
+      </if>
+      <if test="ip != null">
+        ip = #{ip},
+      </if>
+      <if test="sessionCode != null">
+        session_code = #{sessionCode},
+      </if>
+      <if test="laseActiveTime != null">
+        lase_active_time = #{laseActiveTime},
+      </if>
+      <if test="status != null">
+        status = #{status},
+      </if>
+      <if test="cTime != null">
+        c_time = #{cTime},
+      </if>
+      <if test="mTime != null">
+        m_time = #{mTime},
+      </if>
+    </set>
+    WHERE id = #{id}
+  </update>
+
+  <update id="updateByIds" parameterType="java.util.Map">
+    UPDATE base_session
+    <set>
+      <if test="target.baseUserId != null">
+        base_user_id = #{target.baseUserId},
+      </if>
+      <if test="target.ip != null">
+        ip = #{target.ip},
+      </if>
+      <if test="target.sessionCode != null">
+        session_code = #{target.sessionCode},
+      </if>
+      <if test="target.laseActiveTime != null">
+        lase_active_time = #{target.laseActiveTime},
+      </if>
+      <if test="target.status != null">
+        status = #{target.status},
+      </if>
+      <if test="target.cTime != null">
+        c_time = #{target.cTime},
+      </if>
+      <if test="target.mTime != null">
+        m_time = #{target.mTime},
+      </if>
+    </set>
+    WHERE id IN
+    <foreach close=")" collection="ids" item="id" open="(" separator=",">
+      #{id}
+    </foreach>
+  </update>
+
+  <delete id="deleteById" parameterType="long">
+    DELETE FROM base_session WHERE id = #{id}
+  </delete>
+
+  <delete id="deleteByIds" parameterType="java.util.Collection">
+    DELETE FROM base_session WHERE id IN
+    <foreach close=")" collection="collection" item="id" open="(" separator=",">
+      #{id}
+    </foreach>
+  </delete>
+
+  <select id="selectById" parameterType="long" resultType="com.mhdss.dc.dataobject.BaseSessionDO">
+    SELECT <include refid="query_columns"/> FROM base_session WHERE id = #{id}
+  </select>
+
+  <select id="selectIdsByQuery" parameterType="com.mhdss.dc.query.BaseSessionQuery" resultType="long">
+    SELECT id FROM base_session <include refid="limit_where"/>
+  </select>
+
+  <select id="selectByIds" parameterType="java.util.Collection" resultType="com.mhdss.dc.dataobject.BaseSessionDO">
+    SELECT <include refid="query_columns"/> FROM base_session WHERE id IN
+    <foreach close=")" collection="collection" item="id" open="(" separator=",">
+      #{id}
+    </foreach>
+  </select>
+
+  <select id="selectCount" parameterType="com.mhdss.dc.query.BaseSessionQuery" resultType="int">
+    SELECT COUNT(*) FROM base_session <include refid="where"/>
+  </select>
+
+  <select id="selectList" parameterType="com.mhdss.dc.query.BaseSessionQuery" resultType="com.mhdss.dc.dataobject.BaseSessionDO">
+    SELECT <include refid="query_columns"/> FROM base_session <include refid="limit_where"/>
+  </select>
+</mapper>

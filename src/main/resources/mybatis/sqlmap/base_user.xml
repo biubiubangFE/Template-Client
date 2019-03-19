@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mhdss.dc.dao.BaseUserDAO">
+
+  <sql id="insert_columns">
+    (uuid, login_phone, password, salt_key, last_login_time, user_type, status, c_time, m_time)
+  </sql>
+
+  <sql id="insert_values">
+    (#{uuid}, #{loginPhone}, #{password}, #{saltKey}, #{lastLoginTime}, #{userType}, #{status}, #{cTime}, #{mTime})
+  </sql>
+
+  <sql id="query_columns">
+    id, uuid, login_phone AS loginPhone, password, salt_key AS saltKey, last_login_time AS lastLoginTime, user_type AS userType, status, c_time AS cTime, m_time AS mTime
+  </sql>
+
+  <sql id="where">
+    <where>
+      
+    </where>
+  </sql>
+
+  <sql id="limit_where">
+    <include refid="where"/>
+    <if test="range != 0">
+      LIMIT ${start}, ${range}
+    </if>
+  </sql>
+
+  <insert id="insert" parameterType="com.mhdss.dc.dataobject.BaseUserDO">
+    <selectKey keyProperty="id" resultType="long">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>
+    INSERT INTO base_user <include refid="insert_columns"/> VALUES <include refid="insert_values"/>
+  </insert>
+
+  <update id="insertUpdateOnDuplicate" parameterType="com.mhdss.dc.dataobject.BaseUserDO">
+    <selectKey keyProperty="id" resultType="long">
+      SELECT LAST_INSERT_ID() AS id
+    </selectKey>
+    INSERT INTO base_user <include refid="insert_columns"/> VALUES <include refid="insert_values"/> ON DUPLICATE KEY UPDATE m_time = #{mTime}, id = LAST_INSERT_ID(id)
+  </update>
+
+  <update id="updateById" parameterType="com.mhdss.dc.dataobject.BaseUserDO">
+    UPDATE base_user
+    <set>
+      <if test="uuid != null">
+        uuid = #{uuid},
+      </if>
+      <if test="loginPhone != null">
+        login_phone = #{loginPhone},
+      </if>
+      <if test="password != null">
+        password = #{password},
+      </if>
+      updated      <if test="lastLoginTime != null">
+        last_login_time = #{lastLoginTime},
+      </if>
+      <if test="userType != null">
+        user_type = #{userType},
+      </if>
+      <if test="status != null">
+        status = #{status},
+      </if>
+      <if test="cTime != null">
+        c_time = #{cTime},
+      </if>
+      <if test="mTime != null">
+        m_time = #{mTime},
+      </if>
+    </set>
+    WHERE id = #{id}
+  </update>
+
+  <update id="updateByIds" parameterType="java.util.Map">
+    UPDATE base_user
+    <set>
+      <if test="target.uuid != null">
+        uuid = #{target.uuid},
+      </if>
+      <if test="target.loginPhone != null">
+        login_phone = #{target.loginPhone},
+      </if>
+      <if test="target.password != null">
+        password = #{target.password},
+      </if>
+      <if test="target.saltKey != null">
+        salt_key = #{target.saltKey},
+      </if>
+      <if test="target.lastLoginTime != null">
+        last_login_time = #{target.lastLoginTime},
+      </if>
+      <if test="target.userType != null">
+        user_type = #{target.userType},
+      </if>
+      <if test="target.status != null">
+        status = #{target.status},
+      </if>
+      <if test="target.cTime != null">
+        c_time = #{target.cTime},
+      </if>
+      <if test="target.mTime != null">
+        m_time = #{target.mTime},
+      </if>
+    </set>
+    WHERE id IN
+    <foreach close=")" collection="ids" item="id" open="(" separator=",">
+      #{id}
+    </foreach>
+  </update>
+
+  <delete id="deleteById" parameterType="long">
+    DELETE FROM base_user WHERE id = #{id}
+  </delete>
+
+  <delete id="deleteByIds" parameterType="java.util.Collection">
+    DELETE FROM base_user WHERE id IN
+    <foreach close=")" collection="collection" item="id" open="(" separator=",">
+      #{id}
+    </foreach>
+  </delete>
+
+  <select id="selectById" parameterType="long" resultType="com.mhdss.dc.dataobject.BaseUserDO">
+    SELECT <include refid="query_columns"/> FROM base_user WHERE id = #{id}
+  </select>
+
+  <select id="selectIdsByQuery" parameterType="com.mhdss.dc.query.BaseUserQuery" resultType="long">
+    SELECT id FROM base_user <include refid="limit_where"/>
+  </select>
+
+  <select id="selectByIds" parameterType="java.util.Collection" resultType="com.mhdss.dc.dataobject.BaseUserDO">
+    SELECT <include refid="query_columns"/> FROM base_user WHERE id IN
+    <foreach close=")" collection="collection" item="id" open="(" separator=",">
+      #{id}
+    </foreach>
+  </select>
+
+  <select id="selectCount" parameterType="com.mhdss.dc.query.BaseUserQuery" resultType="int">
+    SELECT COUNT(*) FROM base_user <include refid="where"/>
+  </select>
+
+  <select id="selectList" parameterType="com.mhdss.dc.query.BaseUserQuery" resultType="com.mhdss.dc.dataobject.BaseUserDO">
+    SELECT <include refid="query_columns"/> FROM base_user <include refid="limit_where"/>
+  </select>
+</mapper>

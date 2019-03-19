@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mhdss.dc.dao.WxTokenDAO">
+
+    <sql id="insert_columns">
+    (access_token, c_time, m_time, status)
+  </sql>
+
+    <sql id="insert_values">
+    (#{accessToken}, #{cTime}, #{mTime}, #{status})
+  </sql>
+
+    <sql id="query_columns">
+    id, access_token AS accessToken, c_time AS cTime, m_time AS mTime, status
+  </sql>
+
+    <sql id="where">
+        <where>
+
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+
+        </where>
+    </sql>
+
+    <sql id="limit_where">
+        <include refid="where"/>
+        <if test="range != 0">
+            LIMIT ${start}, ${range}
+        </if>
+    </sql>
+
+    <insert id="insert" parameterType="com.mhdss.dc.dataobject.WxTokenDO">
+        <selectKey keyProperty="id" resultType="long">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        INSERT INTO wx_token
+        <include refid="insert_columns"/>
+        VALUES
+        <include refid="insert_values"/>
+    </insert>
+
+    <update id="insertUpdateOnDuplicate" parameterType="com.mhdss.dc.dataobject.WxTokenDO">
+        <selectKey keyProperty="id" resultType="long">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        INSERT INTO wx_token
+        <include refid="insert_columns"/>
+        VALUES
+        <include refid="insert_values"/>
+        ON DUPLICATE KEY UPDATE m_time = #{mTime}, id = LAST_INSERT_ID(id)
+    </update>
+
+    <update id="updateById" parameterType="com.mhdss.dc.dataobject.WxTokenDO">
+        UPDATE wx_token
+        <set>
+            <if test="accessToken != null">
+                access_token = #{accessToken},
+            </if>
+            <if test="cTime != null">
+                c_time = #{cTime},
+            </if>
+            <if test="mTime != null">
+                m_time = #{mTime},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateByIds" parameterType="java.util.Map">
+        UPDATE wx_token
+        <set>
+            <if test="target.accessToken != null">
+                access_token = #{target.accessToken},
+            </if>
+            <if test="target.cTime != null">
+                c_time = #{target.cTime},
+            </if>
+            <if test="target.mTime != null">
+                m_time = #{target.mTime},
+            </if>
+            <if test="target.status != null">
+                status = #{target.status},
+            </if>
+        </set>
+        WHERE id IN
+        <foreach close=")" collection="ids" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+    DELETE FROM wx_token WHERE id = #{id}
+  </delete>
+
+    <delete id="deleteByIds" parameterType="java.util.Collection">
+        DELETE FROM wx_token WHERE id IN
+        <foreach close=")" collection="collection" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectById" parameterType="long" resultType="com.mhdss.dc.dataobject.WxTokenDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM wx_token WHERE id = #{id}
+    </select>
+
+    <select id="selectIdsByQuery" parameterType="com.mhdss.dc.query.WxTokenQuery" resultType="long">
+        SELECT id FROM wx_token
+        <include refid="limit_where"/>
+    </select>
+
+    <select id="selectByIds" parameterType="java.util.Collection" resultType="com.mhdss.dc.dataobject.WxTokenDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM wx_token WHERE id IN
+        <foreach close=")" collection="collection" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectCount" parameterType="com.mhdss.dc.query.WxTokenQuery" resultType="int">
+        SELECT COUNT(*) FROM wx_token
+        <include refid="where"/>
+    </select>
+
+    <select id="selectList" parameterType="com.mhdss.dc.query.WxTokenQuery"
+            resultType="com.mhdss.dc.dataobject.WxTokenDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM wx_token
+        <include refid="limit_where"/>
+    </select>
+
+    <select id="selectByQuery" parameterType="com.mhdss.dc.query.WxTokenQuery"
+            resultType="com.mhdss.dc.dataobject.WxTokenDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM wx_token
+        <include refid="limit_where"/>
+    </select>
+
+    <update id="updateAllStatus">
+        UPDATE wx_token set status =1
+    </update>
+
+</mapper>

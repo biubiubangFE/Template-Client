@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mhdss.dc.dao.BaseResourceDAO">
+
+    <sql id="insert_columns">
+    (title, resource_desc, content, image_file_id, price, expire_time, refund, template_id, policy_id, two_dimension_file_id, online, status, c_time, m_time)
+  </sql>
+
+    <sql id="insert_values">
+    (#{title}, #{resourceDesc}, #{content}, #{imageFileId}, #{price}, #{expireTime}, #{refund}, #{templateId}, #{policyId}, #{twoDimensionFileId}, #{online}, #{status}, #{cTime}, #{mTime})
+  </sql>
+
+    <sql id="query_columns">
+    id, title, resource_desc AS resourceDesc, content, image_file_id AS imageFileId, price, expire_time AS expireTime, refund, template_id AS templateId, policy_id AS policyId, two_dimension_file_id AS twoDimensionFileId, online, status, c_time AS cTime, m_time AS mTime
+  </sql>
+
+    <sql id="where">
+        <where>
+
+        </where>
+    </sql>
+
+    <sql id="limit_where">
+        <include refid="where"/>
+        <if test="range != 0">
+            LIMIT ${start}, ${range}
+        </if>
+    </sql>
+
+    <insert id="insert" parameterType="com.mhdss.dc.dataobject.BaseResourceDO">
+        <selectKey keyProperty="id" resultType="long">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        INSERT INTO base_resource
+        <include refid="insert_columns"/>
+        VALUES
+        <include refid="insert_values"/>
+    </insert>
+
+    <update id="insertUpdateOnDuplicate" parameterType="com.mhdss.dc.dataobject.BaseResourceDO">
+        <selectKey keyProperty="id" resultType="long">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        INSERT INTO base_resource
+        <include refid="insert_columns"/>
+        VALUES
+        <include refid="insert_values"/>
+        ON DUPLICATE KEY UPDATE m_time = #{mTime}, id = LAST_INSERT_ID(id)
+    </update>
+
+    <update id="updateById" parameterType="com.mhdss.dc.dataobject.BaseResourceDO">
+        UPDATE base_resource
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="resourceDesc != null">
+                resource_desc = #{resourceDesc},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="imageFileId != null">
+                image_file_id = #{imageFileId},
+            </if>
+            <if test="price != null">
+                price = #{price},
+            </if>
+            <if test="expireTime != null">
+                expire_time = #{expireTime},
+            </if>
+            <if test="refund != null">
+                refund = #{refund},
+            </if>
+            <if test="templateId != null">
+                template_id = #{templateId},
+            </if>
+            <if test="policyId != null">
+                policy_id = #{policyId},
+            </if>
+            <if test="twoDimensionFileId != null">
+                two_dimension_file_id = #{twoDimensionFileId},
+            </if>
+            <if test="online != null">
+                online = #{online},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="cTime != null">
+                c_time = #{cTime},
+            </if>
+            <if test="mTime != null">
+                m_time = #{mTime},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateByIds" parameterType="java.util.Map">
+        UPDATE base_resource
+        <set>
+            <if test="target.title != null">
+                title = #{target.title},
+            </if>
+            <if test="target.resourceDesc != null">
+                resource_desc = #{target.resourceDesc},
+            </if>
+            <if test="target.content != null">
+                content = #{target.content},
+            </if>
+            <if test="target.imageFileId != null">
+                image_file_id = #{target.imageFileId},
+            </if>
+            <if test="target.price != null">
+                price = #{target.price},
+            </if>
+            <if test="target.expireTime != null">
+                expire_time = #{target.expireTime},
+            </if>
+            <if test="target.refund != null">
+                refund = #{target.refund},
+            </if>
+            <if test="target.templateId != null">
+                template_id = #{target.templateId},
+            </if>
+            <if test="target.policyId != null">
+                policy_id = #{target.policyId},
+            </if>
+            <if test="target.twoDimensionFileId != null">
+                two_dimension_file_id = #{target.twoDimensionFileId},
+            </if>
+            <if test="target.online != null">
+                online = #{target.online},
+            </if>
+            <if test="target.status != null">
+                status = #{target.status},
+            </if>
+            <if test="target.cTime != null">
+                c_time = #{target.cTime},
+            </if>
+            <if test="target.mTime != null">
+                m_time = #{target.mTime},
+            </if>
+        </set>
+        WHERE id IN
+        <foreach close=")" collection="ids" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+    DELETE FROM base_resource WHERE id = #{id}
+  </delete>
+
+    <delete id="deleteByIds" parameterType="java.util.Collection">
+        DELETE FROM base_resource WHERE id IN
+        <foreach close=")" collection="collection" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectById" parameterType="long" resultType="com.mhdss.dc.dataobject.BaseResourceDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM base_resource WHERE id = #{id}
+    </select>
+
+    <select id="selectIdsByQuery" parameterType="com.mhdss.dc.query.BaseResourceQuery" resultType="long">
+        SELECT id FROM base_resource
+        <include refid="limit_where"/>
+    </select>
+
+    <select id="selectByIds" parameterType="java.util.Collection" resultType="com.mhdss.dc.dataobject.BaseResourceDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM base_resource WHERE id IN
+        <foreach close=")" collection="collection" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectCount" parameterType="com.mhdss.dc.query.BaseResourceQuery" resultType="int">
+        SELECT COUNT(*) FROM base_resource
+        <include refid="where"/>
+    </select>
+
+    <select id="selectList" parameterType="com.mhdss.dc.query.BaseResourceQuery"
+            resultType="com.mhdss.dc.dataobject.BaseResourceDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM base_resource
+        <include refid="limit_where"/>
+    </select>
+
+    <update id="updateOverdueStatus" parameterType="java.util.Map">
+       UPDATE base_resource set status = 3 where <![CDATA[ expire_time < #{nowTime}]]> and expire_time != -1
+    </update>
+
+</mapper>

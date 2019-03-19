@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mhdss.dc.dao.BaseWithdrawMoneyDAO">
+
+    <sql id="insert_columns">
+    (wx_user_id, withdraw_money, status, c_time, m_time)
+  </sql>
+
+    <sql id="insert_values">
+    (#{wxUserId}, #{withdrawMoney}, #{status}, #{cTime}, #{mTime})
+  </sql>
+
+    <sql id="query_columns">
+    id, wx_user_id AS wxUserId, withdraw_money AS withdrawMoney, status, c_time AS cTime, m_time AS mTime
+  </sql>
+
+    <sql id="where">
+        <where>
+            <if test="wxUserId != null">
+                AND wx_user_id = #{wxUserId}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_where">
+        <include refid="where"/>
+        ORDER BY id DESC
+        <if test="range != 0">
+            LIMIT ${start}, ${range}
+        </if>
+    </sql>
+
+    <insert id="insert" parameterType="com.mhdss.dc.dataobject.BaseWithdrawMoneyDO">
+        <selectKey keyProperty="id" resultType="long">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        INSERT INTO base_withdraw_money
+        <include refid="insert_columns"/>
+        VALUES
+        <include refid="insert_values"/>
+    </insert>
+
+    <update id="insertUpdateOnDuplicate" parameterType="com.mhdss.dc.dataobject.BaseWithdrawMoneyDO">
+        <selectKey keyProperty="id" resultType="long">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        INSERT INTO base_withdraw_money
+        <include refid="insert_columns"/>
+        VALUES
+        <include refid="insert_values"/>
+        ON DUPLICATE KEY UPDATE m_time = #{mTime}, id = LAST_INSERT_ID(id)
+    </update>
+
+    <update id="updateById" parameterType="com.mhdss.dc.dataobject.BaseWithdrawMoneyDO">
+        UPDATE base_withdraw_money
+        <set>
+            <if test="wxUserId != null">
+                wx_user_id = #{wxUserId},
+            </if>
+            <if test="withdrawMoney != null">
+                withdraw_money = #{withdrawMoney},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="cTime != null">
+                c_time = #{cTime},
+            </if>
+            <if test="mTime != null">
+                m_time = #{mTime},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateByIds" parameterType="java.util.Map">
+        UPDATE base_withdraw_money
+        <set>
+            <if test="target.wxUserId != null">
+                wx_user_id = #{target.wxUserId},
+            </if>
+            <if test="target.withdrawMoney != null">
+                withdraw_money = #{target.withdrawMoney},
+            </if>
+            <if test="target.status != null">
+                status = #{target.status},
+            </if>
+            <if test="target.cTime != null">
+                c_time = #{target.cTime},
+            </if>
+            <if test="target.mTime != null">
+                m_time = #{target.mTime},
+            </if>
+        </set>
+        WHERE id IN
+        <foreach close=")" collection="ids" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+    DELETE FROM base_withdraw_money WHERE id = #{id}
+  </delete>
+
+    <delete id="deleteByIds" parameterType="java.util.Collection">
+        DELETE FROM base_withdraw_money WHERE id IN
+        <foreach close=")" collection="collection" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectById" parameterType="long" resultType="com.mhdss.dc.dataobject.BaseWithdrawMoneyDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM base_withdraw_money WHERE id = #{id}
+    </select>
+
+    <select id="selectIdsByQuery" parameterType="com.mhdss.dc.query.BaseWithdrawMoneyQuery" resultType="long">
+        SELECT id FROM base_withdraw_money
+        <include refid="limit_where"/>
+    </select>
+
+    <select id="selectByIds" parameterType="java.util.Collection"
+            resultType="com.mhdss.dc.dataobject.BaseWithdrawMoneyDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM base_withdraw_money WHERE id IN
+        <foreach close=")" collection="collection" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectCount" parameterType="com.mhdss.dc.query.BaseWithdrawMoneyQuery" resultType="int">
+        SELECT COUNT(*) FROM base_withdraw_money
+        <include refid="where"/>
+    </select>
+
+    <select id="selectList" parameterType="com.mhdss.dc.query.BaseWithdrawMoneyQuery"
+            resultType="com.mhdss.dc.dataobject.BaseWithdrawMoneyDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM base_withdraw_money
+        <include refid="limit_where"/>
+
+    </select>
+</mapper>

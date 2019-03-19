@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mhdss.dc.dao.BaseOrderDAO">
+
+    <sql id="insert_columns">
+    (wx_user_id, resource_id, attach, out_trade_no, total_fee, spbill_create_ip, time_start, time_expire, product_id, openid, order_status, prepay_id,transaction_id, status, c_time, m_time)
+  </sql>
+
+    <sql id="insert_values">
+    (#{wxUserId}, #{resourceId}, #{attach}, #{outTradeNo}, #{totalFee}, #{spbillCreateIp}, #{timeStart}, #{timeExpire}, #{productId}, #{openid}, #{orderStatus}, #{prepayId},  #{transactionId},  #{status}, #{cTime}, #{mTime})
+  </sql>
+
+    <sql id="query_columns">
+    id, wx_user_id AS wxUserId, resource_id AS resourceId, attach, out_trade_no AS outTradeNo, total_fee AS totalFee, spbill_create_ip AS spbillCreateIp, time_start AS timeStart, time_expire AS timeExpire, product_id AS productId, openid, order_status AS orderStatus, prepay_id AS prepayId,transaction_id AS transactionId, status, c_time AS cTime, m_time AS mTime
+  </sql>
+
+    <sql id="where">
+        <where>
+            <if test="outTradeNo != null">
+                AND out_trade_no = #{outTradeNo}
+            </if>
+            <if test="openid != null">
+                AND openid = #{openid}
+            </if>
+            <if test="orderStatus != null">
+                AND order_status = #{orderStatus}
+            </if>
+        </where>
+    </sql>
+
+    <sql id="limit_where">
+        <include refid="where"/>
+        ORDER BY id DESC
+        <if test="range != 0">
+            LIMIT ${start}, ${range}
+        </if>
+    </sql>
+
+    <insert id="insert" parameterType="com.mhdss.dc.dataobject.BaseOrderDO">
+        <selectKey keyProperty="id" resultType="long">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        INSERT INTO base_order
+        <include refid="insert_columns"/>
+        VALUES
+        <include refid="insert_values"/>
+    </insert>
+
+    <update id="insertUpdateOnDuplicate" parameterType="com.mhdss.dc.dataobject.BaseOrderDO">
+        <selectKey keyProperty="id" resultType="long">
+            SELECT LAST_INSERT_ID() AS id
+        </selectKey>
+        INSERT INTO base_order
+        <include refid="insert_columns"/>
+        VALUES
+        <include refid="insert_values"/>
+        ON DUPLICATE KEY UPDATE m_time = #{mTime}, id = LAST_INSERT_ID(id)
+    </update>
+
+    <update id="updateById" parameterType="com.mhdss.dc.dataobject.BaseOrderDO">
+        UPDATE base_order
+        <set>
+            <if test="wxUserId != null">
+                wx_user_id = #{wxUserId},
+            </if>
+            <if test="resourceId != null">
+                resource_id = #{resourceId},
+            </if>
+            <if test="attach != null">
+                attach = #{attach},
+            </if>
+            <if test="outTradeNo != null">
+                out_trade_no = #{outTradeNo},
+            </if>
+            <if test="totalFee != null">
+                total_fee = #{totalFee},
+            </if>
+            <if test="spbillCreateIp != null">
+                spbill_create_ip = #{spbillCreateIp},
+            </if>
+            <if test="timeStart != null">
+                time_start = #{timeStart},
+            </if>
+            <if test="timeExpire != null">
+                time_expire = #{timeExpire},
+            </if>
+            <if test="productId != null">
+                product_id = #{productId},
+            </if>
+            <if test="openid != null">
+                openid = #{openid},
+            </if>
+            <if test="orderStatus != null">
+                order_status = #{orderStatus},
+            </if>
+            <if test="prepayId != null">
+                prepay_id = #{prepayId},
+            </if>
+
+            <if test="transactionId != null">
+                transaction_id = #{transactionId},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="cTime != null">
+                c_time = #{cTime},
+            </if>
+            <if test="mTime != null">
+                m_time = #{mTime},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateByIds" parameterType="java.util.Map">
+        UPDATE base_order
+        <set>
+            <if test="target.wxUserId != null">
+                wx_user_id = #{target.wxUserId},
+            </if>
+            <if test="target.resourceId != null">
+                resource_id = #{target.resourceId},
+            </if>
+            <if test="target.attach != null">
+                attach = #{target.attach},
+            </if>
+            <if test="target.outTradeNo != null">
+                out_trade_no = #{target.outTradeNo},
+            </if>
+            <if test="target.totalFee != null">
+                total_fee = #{target.totalFee},
+            </if>
+            <if test="target.spbillCreateIp != null">
+                spbill_create_ip = #{target.spbillCreateIp},
+            </if>
+            <if test="target.timeStart != null">
+                time_start = #{target.timeStart},
+            </if>
+            <if test="target.timeExpire != null">
+                time_expire = #{target.timeExpire},
+            </if>
+            <if test="target.productId != null">
+                product_id = #{target.productId},
+            </if>
+            <if test="target.openid != null">
+                openid = #{target.openid},
+            </if>
+            <if test="target.orderStatus != null">
+                order_status = #{target.orderStatus},
+            </if>
+            <if test="target.prepayId != null">
+                prepay_id = #{target.prepayId},
+            </if>
+
+            <if test="target.transactionId != null">
+                transaction_id = #{target.transactionId},
+            </if>
+            <if test="target.status != null">
+                status = #{target.status},
+            </if>
+            <if test="target.cTime != null">
+                c_time = #{target.cTime},
+            </if>
+            <if test="target.mTime != null">
+                m_time = #{target.mTime},
+            </if>
+        </set>
+        WHERE id IN
+        <foreach close=")" collection="ids" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+    DELETE FROM base_order WHERE id = #{id}
+  </delete>
+
+    <delete id="deleteByIds" parameterType="java.util.Collection">
+        DELETE FROM base_order WHERE id IN
+        <foreach close=")" collection="collection" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectById" parameterType="long" resultType="com.mhdss.dc.dataobject.BaseOrderDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM base_order WHERE id = #{id}
+    </select>
+
+    <select id="selectIdsByQuery" parameterType="com.mhdss.dc.query.BaseOrderQuery" resultType="long">
+        SELECT id FROM base_order
+        <include refid="limit_where"/>
+    </select>
+
+    <select id="selectByIds" parameterType="java.util.Collection" resultType="com.mhdss.dc.dataobject.BaseOrderDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM base_order WHERE id IN
+        <foreach close=")" collection="collection" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+    </select>
+
+    <select id="selectCount" parameterType="com.mhdss.dc.query.BaseOrderQuery" resultType="int">
+        SELECT COUNT(*) FROM base_order
+        <include refid="where"/>
+    </select>
+
+    <select id="selectList" parameterType="com.mhdss.dc.query.BaseOrderQuery"
+            resultType="com.mhdss.dc.dataobject.BaseOrderDO">
+        SELECT
+        <include refid="query_columns"/>
+        FROM base_order
+        <include refid="limit_where"/>
+
+    </select>
+</mapper>
